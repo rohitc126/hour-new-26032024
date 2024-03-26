@@ -1,0 +1,125 @@
+﻿@model BusinessLayer.Entity.HourMeterReport
+
+@{
+    ViewBag.Title = "HourMeterHRMReadings_Entry";
+    Layout = "~/Views/Shared/_MainDashboard.cshtml";
+}
+
+<style>
+    .table thead th {
+        font-weight: 600;
+        font-size: 15px;
+        border-bottom: 0;
+        padding-left: 1rem;
+    }
+
+    .table td {
+        font-weight: 600;
+        font-size: 11px;
+        border-bottom: 0;
+        padding-left: 1rem;
+    }
+
+    .table td, .table th {
+        padding: 0.25rem;
+        vertical-align: top;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .table td, .table th {
+        padding: 0.25rem;
+        vertical-align: top;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .table .form-control {
+        height: 35px;
+    }
+</style>
+
+
+@using (Html.BeginForm("HourMeterHRMReadings_Entry", "HRMReading", FormMethod.Post, new { @id = "frmHourMeterHRMReadings_Entry", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    Html.RenderPartial("_Alerts");
+
+    <div class="pd-20 card-box mb-30">
+        <div class="clearfix">
+            <div style="text-align:center">
+                <h4 class="text-blue h4">HOUR METER HMR READINGS</h4>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-12 col-md-2 col-form-label">Shift Time</label>
+            <div class="col-sm-12 col-md-4">
+                @Html.DropDownListFor(x => x.SHIFT_Code, Model.SHIFT_LIST, "Select Shift", new { @class = "custom-select2 form-control", @id = "ddlShift", @data_placeholder = "Select Shift", @style = "width: 100%;" })
+                @Html.ValidationMessageFor(x => x.SHIFT_Code, "", new { @id = "spnErr_ddlShift" })
+            </div>
+            <label class="col-sm-12 col-md-2 col-form-label">Production Date</label>
+            <div class="col-sm-12 col-md-4">
+                @Html.TextBoxFor(x => x.PRODUCTION_DATE, new { @class = "form-control", @id = "txtProductiondate", @autocomplete = "off", @readonly = true })
+            </div>
+        </div>
+
+        <div id="divPartial"></div>
+        <div class="form-group row">
+            <div class="col-md-12" style="padding-top:5px; padding-bottom:15px; padding-right:13px;text-align:center;">
+                <input type="submit" class="btn btn-success" value="Save" name="Save" style="width:auto;" id="btnSubmit" />
+                <input type="submit" class="btn btn-warning" value="Update" name="Update" style="width: auto;" id="btnUpdate" />
+                <input type="reset" class="btn btn-danger" value="Reset" style="width:auto;" id="btnReset" />
+                <input type="submit" class="btn btn-info" value="Lock" name="Lock" style="width: auto; " id="btnLock" />
+                <input type="button" class="btn btn-warning" value="Back" name="Back" style="width: auto;" id="btnBack" />
+                @Html.HiddenFor(x => x.hdnShiftTime, new { @id = "hdnShiftTime" })
+            </div>
+        </div>
+    </div>
+}
+<script src="~/assets/js/jquery-2.1.4.min.js"></script>
+<script src="~/Scripts/Custom/customValidation.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#btnBack').show();
+        $('#btnSubmit').hide();
+        $('#btnLock').hide();
+        $('#btnReset').hide();
+        $('#btnUpdate').hide();
+
+        $("#btnReset").on("click", function () {
+            var url = '@Url.Action("HourMeterHRMReadings_Entry", "HRMReading")';
+            window.location.href = url;
+        });
+
+        $("#btnBack").on("click", function () {
+            var url = '@Url.Action("HourMeterHRMReadings", "HRMReading")';
+            window.location.href = url;
+        });
+
+        $('#ddlShift').change(function () {
+            $('#btnSubmit').hide();
+            $('#btnUpdate').hide();
+            $('#btnLock').hide();
+            if ($('#ddlShift').val() != "") {
+
+                $("#divPartial").load("../HRMReading/_HourMeterHRMReadings_Dtl", { Shift_Code: $('#ddlShift').val(), ProductionDate: $('#txtProductiondate').val() }, function () {
+                    $('#btnBack').show();
+                    $('#btnSubmit').hide();
+                    $('#btnLock').hide();
+                    $('#btnReset').hide();
+                    $('#btnUpdate').hide();
+
+                    $('#spnTitle').text($('#ddlShift :selected').text());
+
+                });
+                $('#divPartial').slideDown('slow');
+
+            }
+            else {
+                $('#divPartial').slideUp('slow');
+            }
+        });
+    });
+</script>
+

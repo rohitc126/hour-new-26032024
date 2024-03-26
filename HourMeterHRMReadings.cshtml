@@ -1,0 +1,162 @@
+﻿@{
+    ViewBag.Title = "Hour Meter HRM Readings";
+    Layout = "~/Views/Shared/_MainDashboard.cshtml";
+}
+
+<link rel="stylesheet" type="text/css" href="~/src/plugins/fullcalendar/fullcalendar.css">
+
+<style>
+
+
+
+
+    .table thead th {
+        font-weight: 600;
+        font-size: 14px;
+        border-bottom: 0;
+        padding-left: 1rem;
+        background-color: #000000;
+        color: white;
+    }
+
+    .table td {
+        font-weight: 600;
+        font-size: 12px;
+        border-bottom: 0;
+        padding-left: 1rem;
+    }
+
+    .table td, .table th {
+        padding: 0.25rem;
+        vertical-align: top;
+        border: 1px solid #dee2e6;
+    }
+
+    tr:nth-child(even) {
+        background-color: #fffada;
+    }
+
+    .fc-day-number, .fc-ltr .fc-axis {
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    .fc-view-container tr:first-child > td > .fc-day-grid-event {
+        background: none;
+    }
+    .fc-event {
+        border:none;
+    }
+    .fc-title {
+        font-size: 14px;
+        font-weight: bold;
+        color: #040783;
+    }
+</style>
+
+@using (Html.BeginForm("HourMeterHRMReadings", "HRMReading", FormMethod.Post, new { @id = "frmHourMeterHRMReadings", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    Html.RenderPartial("_Alerts");
+
+
+    <div class="xs-pd-20-10">
+        <div class="min-height-200px">
+            <div class="pd-20 card-box mb-2">
+                <div class="calendar-wrap">
+                    <div id='calendar'></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+<script src="~/vendors/scripts/core.js"></script>
+<script src="~/src/plugins/fullcalendar/fullcalendar.min.js"></script>
+<script type="text/javascript">
+
+
+
+
+    jQuery(function ($) {
+
+        var date = new Date();
+        var d = date.getDate();
+        var m = date.getMonth();
+        var y = date.getFullYear();
+          
+     
+        var eventList = '';
+        var array = [];
+          
+        $.ajax({
+            type: "POST",
+            url: '../Strategy/getSalesStrategyCalender',
+            data: { month: m, years: y },
+            datatype: "json",
+            async: false,
+            success: function (data, textStatus, xhr) {
+
+                if (data.length > 0) {
+                    for (var i = 0; i < data.length; i++) {
+
+                        array.push({
+                            title: 'Strategy',
+                            start: data[i].start,
+                            end: data[i].end
+                        }); 
+                    }
+                } 
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });        
+         
+        var calendar = $('#calendar').fullCalendar({
+
+            height: 401,
+
+            buttonHtml: {
+                prev: '<i class="ace-icon fa fa-chevron-left"></i>',
+                next: '<i class="ace-icon fa fa-chevron-right"></i>'
+            },
+
+            header: {
+                left: 'prev,next today',
+                center: 'title'
+            },
+          
+            selectable: true,
+            selectHelper: true,
+          
+            validRange: function (nowDate) {
+                return {
+                    start: '1900-01-01',
+                    end: nowDate.clone().add(1, 'days')
+                };
+            },
+            select: function (start, end, allDay) {
+                var selectedDate = start.format('YYYY-MM-DD');
+                var todate = new Date(start).getDate();
+                var tomonth = new Date(start).getMonth() + 1;
+                var toyear = new Date(start).getFullYear();
+                var original_date = pad(todate, 2) + '/' + pad(tomonth, 2) + '/' + toyear;
+
+                window.location.href = "/HRMReading/HourMeterHRMReadings_Entry?PRODUCTION_DATE=" +original_date;
+                console.log('Selected Date:', selectedDate);
+                calendar.fullCalendar('unselect');
+            }
+        });
+
+        function pad(str, max) {
+            str = str.toString();
+            return str.length < max ? pad("0" + str, max) : str;
+        }
+      
+    });
+
+
+</script>

@@ -1,0 +1,79 @@
+﻿@model BusinessLayer.Entity.HourMeterReport
+
+<div class="card-box mb-30" style="padding:10px;">
+    <div class="table-responsive">
+        <table class="table table-bordered" style="font-size:10px; padding:0px;  margin:0px;min-width:600px;" id="tblList">
+            <thead>
+                <tr>
+                    <th style="width:200px;text-align:center;">Reading</th>
+                    <th style="width:50px;text-align:center;">Meter Reading</th>
+                    <th style="width:250px;text-align:center;">Remarks</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyList">
+                @for (int i = 0; i < Model.HourMeterDtl_List.Count(); i++)
+                {
+                    <tr id="tr_@i">
+                        <td data-title="Reading">
+                            @Html.TextBoxFor(model => model.HourMeterDtl_List[i].PM_NAME, new { @class = "form-control cal numeric", @id = "txtPM_NAME_" + i, @autocomplete = "off", @readonly = true })
+                            @Html.HiddenFor(model => model.HourMeterDtl_List[i].PM_ID, new { @class = "form-control", @id = "hdnPM_ID_" + i })
+                            @Html.HiddenFor(model => model.HourMeterDtl_List[i].HMRR_ID, new { @class = "form-control", @id = "hdnHMRR_ID_" + i })
+                        </td>
+                      
+                        <td data-title="Total">
+                            @Html.TextBoxFor(model => model.HourMeterDtl_List[i].Total, new { @class = "form-control", @id = "txtTotal_" + i, @data_placeholder = "Enter Meter Reading", @autocomplete = "off" })
+                            <span id="spnErr_txtTotal_@i" class=" field-validation-error"></span>
+                        </td>
+                        <td data-title="Remarks">
+                            @Html.TextBoxFor(model => model.HourMeterDtl_List[i].Remarks, new { @class = "form-control", @id = "txtRemarks_" + i, @data_placeholder = "Enter Remarks", @autocomplete = "off" })
+                            <span id="spnErr_txtRemarks_@i" class=" field-validation-error"></span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.HourMeterDtl_List != null)
+    {
+        if (Model.HourMeterDtl_List.Count() > 0)
+        {
+
+            @Html.HiddenFor(model => model.HourMeterDtl_List[0].HMR_ID, new { @class = "form-control", @id = "hdnHMR_ID" })
+            @Html.HiddenFor(model => model.HourMeterDtl_List[0].IS_LOCKED, new { @class = "form-control", @id = "hdnIS_LOCKED" })
+
+        }
+    }
+</div>
+<script src="~/FormJS/HRMREADING.js"></script>
+
+<script>
+    $("#btnSubmit").click(function (e) {
+        var errCnt = 0;
+        var rowCount = $('#tbodyList tr').length;
+        for (var i = 0; i < rowCount; i++) {
+            var txtTotal_ = $('#txtTotal_' + i).val();
+
+            if (txtTotal_ != '') {
+                 errCnt = errCnt + 1;
+            }
+        }
+        if (errCnt == 0) {
+
+            $('#lblMsg').text('Please fill in at least one row of data.');
+            $('#alert-modal').modal('show');
+            e.preventDefault();
+        }
+    });
+    $("#btnUpdate").click(function (e) {
+        var errCnt = 0;
+        var rowCount = $('#tbodyList tr').length;
+        for (var i = 0; i < rowCount; i++) {
+            var txtTotal_ = $('#txtTotal_' + i).val();
+            var txtRemarks_ = $('#txtRemarks_' + i).val();
+
+            if ( txtTotal_ != '' && txtRemarks_ != '') {
+                errCnt = errCnt + 1;
+            }
+        }
+    });
+</script>
